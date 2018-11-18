@@ -1,7 +1,9 @@
 package page
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"sync"
 
@@ -35,18 +37,22 @@ func Get(dom string, url string, dest string, wg *sync.WaitGroup, mux *sync.Mute
 
 	// The page was found
 	if resp.StatusCode == http.StatusOK {
-
 		// Save page
-		//wg.Add(1)
+		b, err := ioutil.ReadAll(resp.Body)
+		helper.Check(err)
+		wg.Add(1)
+		go savePage(dest, url, b, wg)
 
+		// Reset response read state
+		resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
 		res := getPageResources(resp)
 
-		fmt.Println(res)
 		// Download files
 		for _, l := range removeDuplicateFiles(res["files"], mux) {
 			fmt.Println("Fetching " + domain + l)
 			// Save
-			//wg.Add(1)
+			wg.Add(1)
+			go saveResource(dest, l, wg)
 		}
 
 		// Follow links

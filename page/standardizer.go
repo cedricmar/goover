@@ -25,6 +25,20 @@ func simplifyURL(url string) string {
 	return "/" + strings.Trim(url, "/")
 }
 
+func getSavePath(dest string, path string) string {
+	if path == "/" {
+		return dest
+	}
+	return dest + strings.Trim(path, "/") + "/"
+}
+
+func getFilePath(dest, url string) (filename, path string) {
+	t := strings.Split(url, "/")
+	filename = t[len(t)-1]
+	path = strings.TrimRight(dest, "/") + strings.TrimRight(url, t[len(t)-1])
+	return
+}
+
 func removeDuplicateLinks(urls []string, mux *sync.Mutex) []string {
 	noDupes := []string{}
 	for _, l := range urls {
