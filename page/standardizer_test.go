@@ -1,7 +1,8 @@
-package main
+package page
 
 import (
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -50,8 +51,9 @@ func TestRemoveDuplicates(t *testing.T) {
 		{6, []string{"/titi/", "/tutu/"}, []string{"/titi/", "/tutu/"}},
 	}
 
+	var mux = sync.Mutex{}
 	for _, tc := range testCases {
-		d := removeDuplicateLinks(tc.links)
+		d := removeDuplicateLinks(tc.links, &mux)
 		tcStr := strings.Join(tc.assert[:], ",")
 		dStr := strings.Join(d[:], ",")
 
